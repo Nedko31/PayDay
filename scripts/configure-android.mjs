@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const appId = 'ca-app-pub-7326151414179206~5828675543';
+const appId = 'ca-app-pub-7103616487584005~5306090460';
 const manifestPath = path.resolve('android/app/src/main/AndroidManifest.xml');
 const stringsPath = path.resolve('android/app/src/main/res/values/strings.xml');
 if (!fs.existsSync(manifestPath)) {
