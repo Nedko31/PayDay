@@ -79,10 +79,11 @@ function refreshLabels(){
  const tab=document.querySelector('.tab[data-panel="fxPanel"]'),nav=document.querySelector('.navitem[data-panel="fxPanel"]');
  if(tab)tab.textContent=tr('tab');if(nav)nav.querySelector('span').textContent=tr('tab');
  const panel=$('fxPanel');if(!panel)return;
+ const oldTab=document.querySelector('.tab[data-panel=fxPanel]'),oldNav=document.querySelector('.navitem[data-panel=fxPanel]');
  const keep=active?'fxPanel':null;
  const amount=$('fxAmount')?.value||'100',from=$('fxFrom')?.value||'EUR',to=$('fxTo')?.value||'USD';
  const current=!!panel.classList.contains('active');
- panel.remove();$('fxPanel')?.remove();
+ panel.remove();oldTab?.remove();oldNav?.remove();
  addInterface();
  $('fxAmount').value=amount;$('fxFrom').value=from;$('fxTo').value=to;
  if(current){document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id==='fxPanel'));document.querySelectorAll('[data-panel]').forEach(x=>x.classList.toggle('active',x.dataset.panel==='fxPanel'));}
@@ -91,7 +92,7 @@ function refreshLabels(){
 async function loadCurrencies(){
  try{
   const response=await fetch(API+'/currencies',{cache:'no-store'});if(!response.ok)throw new Error('currencies');
-  const rows=await response.json();currencyNames=Object.fromEntries(rows.map(x=>[x.iso_code,x.name]));
+  const rows=(await response.json()).filter(x=>x.iso_code!=='RUB');currencyNames=Object.fromEntries(rows.map(x=>[x.iso_code,x.name]));
   const mainSelect=$('currency');if(mainSelect){
    const selected=mainSelect.value||'EUR';mainSelect.replaceChildren();
    rows.sort((a,b)=>a.iso_code.localeCompare(b.iso_code)).forEach(x=>mainSelect.add(new Option(x.iso_code+' — '+x.name,x.iso_code)));
