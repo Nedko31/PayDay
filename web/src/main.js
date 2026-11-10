@@ -53,6 +53,7 @@ const PAYDAY_ADMOB = {
 };
 let paydayAdMobInitialized = false;
 let paydayBannerVisible = false;
+let paydayBannerCreated = false;
 let paydayAdStartPromise = null;
 let paydayAdHiddenByUser = false;
 const paydayIsAndroid = Capacitor.getPlatform() === 'android';
@@ -111,24 +112,34 @@ async function startPaydayAds() {
             try { await AdMob.hideBanner(); } catch (error) { console.warn('PayDay AdMob hide after late load failed:', error); }
             return;
           }
+          paydayBannerCreated = true;
           paydayBannerVisible = true;
           setPaydayAdLayout(true);
         });
         await AdMob.addListener(BannerAdPluginEvents.FailedToLoad, error => {
+          paydayBannerCreated = false;
           paydayBannerVisible = false;
           setPaydayAdLayout(false);
           console.warn('PayDay AdMob banner failed to load:', error);
           // Ad load errors are logged without a user-facing popup.
         });
       }
-      const adId = PAYDAY_ADMOB.useTestAds ? PAYDAY_ADMOB.testBannerId : PAYDAY_ADMOB.productionBannerId;
-      await AdMob.showBanner({
-        adId,
-        adSize: BannerAdSize.ADAPTIVE_BANNER,
-        position: BannerAdPosition.BOTTOM_CENTER,
-        margin: 0,
-        isTesting: PAYDAY_ADMOB.useTestAds
-      });
+      if (paydayBannerCreated) {
+        // hideBanner() keeps the native banner alive. Reuse it with resumeBanner()
+        // instead of calling showBanner() again, which can create a second load
+        // against the existing Android view and cause the banner to disappear.
+        await AdMob.resumeBanner();
+      } else {
+        const adId = PAYDAY_ADMOB.useTestAds ? PAYDAY_ADMOB.testBannerId : PAYDAY_ADMOB.productionBannerId;
+        await AdMob.showBanner({
+          adId,
+          adSize: BannerAdSize.ADAPTIVE_BANNER,
+          position: BannerAdPosition.BOTTOM_CENTER,
+          margin: 0,
+          isTesting: PAYDAY_ADMOB.useTestAds
+        });
+        paydayBannerCreated = true;
+      }
       if (paydayAdHiddenByUser) {
         paydayBannerVisible = false;
         setPaydayAdLayout(false);
