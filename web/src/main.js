@@ -49,7 +49,7 @@ const PAYDAY_ADMOB = {
   productionBannerId: 'ca-app-pub-7103616487584005/9772608224',
   // Google demo banner ID for Android testing. Never click test ads.
   testBannerId: 'ca-app-pub-3940256099942544/6300978111',
-  useTestAds: false
+  useTestAds: true // TEMPORARY: diagnostic build only; switch back before release
 };
 let paydayAdMobInitialized = false;
 let paydayBannerVisible = false;
@@ -81,7 +81,9 @@ async function stopPaydayBanner() {
 }
 
 async function startPaydayAds() {
-  if (!paydayIsAndroid || !navigator.onLine || paydayAdHiddenByUser) return;
+  if (!paydayIsAndroid) return;
+  if (!navigator.onLine) { showToast('AdMob: no internet connection.'); return; }
+  if (paydayAdHiddenByUser) { showToast('AdMob banner is hidden in settings.'); return; }
   if (paydayAdStartPromise) return paydayAdStartPromise;
   paydayAdStartPromise = (async () => {
     try {
@@ -90,7 +92,8 @@ async function startPaydayAds() {
         consent = await AdMob.showConsentForm();
       }
       if (!consent.canRequestAds) {
-        console.info('PayDay AdMob: consent does not allow ad requests yet.');
+        console.warn('PayDay AdMob: consent does not allow ad requests yet.', consent);
+        showToast('AdMob: consent is not ready; ads cannot be requested.');
         return;
       }
       if (!paydayAdMobInitialized) {
@@ -107,6 +110,7 @@ async function startPaydayAds() {
           paydayBannerVisible = false;
           setPaydayAdLayout(false);
           console.warn('PayDay AdMob banner failed to load:', error);
+          showToast(`AdMob load failed: ${error?.message || error?.code || 'unknown error'}`);
         });
       }
       const adId = PAYDAY_ADMOB.useTestAds ? PAYDAY_ADMOB.testBannerId : PAYDAY_ADMOB.productionBannerId;
@@ -119,9 +123,11 @@ async function startPaydayAds() {
       });
       paydayBannerVisible = true;
       setPaydayAdLayout(true);
+      showToast('AdMob: test banner request sent.');
     } catch (error) {
       // Ad failures must never prevent PayDay's budgeting features from working.
       console.warn('PayDay AdMob startup failed; app remains usable:', error);
+      showToast(`AdMob startup failed: ${error?.message || error?.code || String(error)}`);
       paydayBannerVisible = false;
       setPaydayAdLayout(false);
     }
