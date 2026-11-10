@@ -82,8 +82,8 @@ async function stopPaydayBanner() {
 
 async function startPaydayAds() {
   if (!paydayIsAndroid) return;
-  if (!navigator.onLine) { showToast('AdMob: no internet connection.'); return; }
-  if (paydayAdHiddenByUser) { showToast('AdMob banner is hidden in settings.'); return; }
+  if (!navigator.onLine) { console.info('PayDay AdMob: waiting for internet connection.'); return; }
+  if (paydayAdHiddenByUser) return;
   if (paydayAdStartPromise) return paydayAdStartPromise;
   paydayAdStartPromise = (async () => {
     try {
@@ -93,7 +93,7 @@ async function startPaydayAds() {
       }
       if (!consent.canRequestAds) {
         console.warn('PayDay AdMob: consent does not allow ad requests yet.', consent);
-        showToast('AdMob: consent is not ready; ads cannot be requested.');
+        console.info('PayDay AdMob: consent is not ready; ads cannot be requested.');
         return;
       }
       if (!paydayAdMobInitialized) {
@@ -110,7 +110,7 @@ async function startPaydayAds() {
           paydayBannerVisible = false;
           setPaydayAdLayout(false);
           console.warn('PayDay AdMob banner failed to load:', error);
-          showToast(`AdMob load failed: ${error?.message || error?.code || 'unknown error'}`);
+          // Ad load errors are logged without a user-facing popup.
         });
       }
       const adId = PAYDAY_ADMOB.useTestAds ? PAYDAY_ADMOB.testBannerId : PAYDAY_ADMOB.productionBannerId;
@@ -123,11 +123,11 @@ async function startPaydayAds() {
       });
       paydayBannerVisible = true;
       setPaydayAdLayout(true);
-      showToast('AdMob: production banner request sent.');
+      // No user-facing message for normal AdMob startup.
     } catch (error) {
       // Ad failures must never prevent PayDay's budgeting features from working.
       console.warn('PayDay AdMob startup failed; app remains usable:', error);
-      showToast(`AdMob startup failed: ${error?.message || error?.code || String(error)}`);
+      // Keep AdMob errors in the console; do not interrupt the user with a popup.
       paydayBannerVisible = false;
       setPaydayAdLayout(false);
     }
