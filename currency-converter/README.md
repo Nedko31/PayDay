@@ -1,20 +1,20 @@
-# Global Currency Converter
+# Curvex
 
-Standalone Capacitor Android project. This is a separate folder and does not modify or remove the converter inside PayDay.
+Standalone Capacitor Android currency and cryptocurrency converter.
 
 ## Included
 - Fiat currency reference rates from Frankfurter API
 - Major crypto prices from CoinGecko API
 - Fiat-to-fiat, crypto-to-crypto and fiat-to-crypto conversion using USD as the common reference
 - Bottom AdMob banner integration with a hide control
-- Separate Android application ID: `com.studioprodigy.currencyconverter`
+- Separate Android application ID: `com.studioprodigy.curvex`
 
 ## Before release: AdMob
 Create a **new app** and a **new banner ad unit** in AdMob. Do not reuse the PayDay app ID or PayDay banner unit. Set:
 - `ADMOB_APP_ID` in `scripts/configure-android.mjs` (or environment variable)
 - `ADMOB_APP_ID` and `ADMOB_BANNER_ID` in `src/main.js`
 
-The current values are deliberate placeholders. The banner is configured in test mode (`isTesting: true`) until the new AdMob units are approved and configured. Never click live ads during testing.
+The current values are deliberate placeholders. Configure real Curvex ad units before publishing. Never click live ads during testing.
 
 ## Build
 ```bash
