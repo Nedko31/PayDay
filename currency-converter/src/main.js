@@ -43,12 +43,11 @@ $('swap').addEventListener('click',()=>{const v=$('from').value;$('from').value=
 $('refresh').addEventListener('click',refresh);
 $('copy').addEventListener('click',async()=>{if(state.last){try{await navigator.clipboard.writeText(state.last);$('status').textContent='Copied.'}catch{$('status').textContent='Copy is not available on this device.'}}});
 populate();refresh();window.addEventListener('online',refresh);
-const ADMOB_APP_ID='ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY';
-const ADMOB_BANNER_ID='ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ';
+const ADMOB_APP_ID='ca-app-pub-3940256099942544~3347511713';
+const ADMOB_BANNER_ID='ca-app-pub-3940256099942544/6300978111';
 let bannerHidden=false;
 async function startAds(){
  if(Capacitor.getPlatform()!=='android'||!navigator.onLine||bannerHidden)return;
- if(ADMOB_APP_ID.includes('XXXX')||ADMOB_BANNER_ID.includes('XXXX')){$('ad-slot').textContent='AdMob IDs required';return;}
  try{
   await AdMob.initialize();
   await AdMob.showBanner({adId:ADMOB_BANNER_ID,adSize:BannerAdSize.ADAPTIVE_BANNER,position:BannerAdPosition.BOTTOM,margin:0,isTesting:true});
