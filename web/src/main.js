@@ -74,10 +74,12 @@ function updatePaydayAdToggle() {
 }
 
 async function stopPaydayBanner() {
-  if (!paydayIsAndroid || !paydayBannerVisible) return;
-  try { await AdMob.hideBanner(); } catch (error) { console.warn('PayDay AdMob hide failed:', error); }
+  if (!paydayIsAndroid) return;
+  // Hide even if showBanner() is still in flight; otherwise a late Loaded event
+  // can briefly reveal the banner after the user has chosen Hide.
   paydayBannerVisible = false;
   setPaydayAdLayout(false);
+  try { await AdMob.hideBanner(); } catch (error) { console.warn('PayDay AdMob hide failed:', error); }
 }
 
 async function startPaydayAds() {
@@ -102,7 +104,13 @@ async function startPaydayAds() {
         await AdMob.addListener(BannerAdPluginEvents.SizeChanged, info => {
           if (paydayBannerVisible) setPaydayAdLayout(true, info?.height || 60);
         });
-        await AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
+        await AdMob.addListener(BannerAdPluginEvents.Loaded, async () => {
+          if (paydayAdHiddenByUser) {
+            paydayBannerVisible = false;
+            setPaydayAdLayout(false);
+            try { await AdMob.hideBanner(); } catch (error) { console.warn('PayDay AdMob hide after late load failed:', error); }
+            return;
+          }
           paydayBannerVisible = true;
           setPaydayAdLayout(true);
         });
@@ -121,6 +129,12 @@ async function startPaydayAds() {
         margin: 0,
         isTesting: PAYDAY_ADMOB.useTestAds
       });
+      if (paydayAdHiddenByUser) {
+        paydayBannerVisible = false;
+        setPaydayAdLayout(false);
+        try { await AdMob.hideBanner(); } catch (error) { console.warn('PayDay AdMob hide after request failed:', error); }
+        return;
+      }
       paydayBannerVisible = true;
       setPaydayAdLayout(true);
       // No user-facing message for normal AdMob startup.
@@ -142,8 +156,14 @@ if (paydayIsAndroid) {
     paydayAdHiddenByUser = !paydayAdHiddenByUser;
     try { localStorage.setItem('payday_ad_hidden', paydayAdHiddenByUser ? '1' : '0'); } catch {}
     updatePaydayAdToggle();
-    if (paydayAdHiddenByUser) await stopPaydayBanner();
-    else await startPaydayAds();
+    if (paydayAdHiddenByUser) {
+      // Collapse the web layout immediately and hide the native view regardless
+      // of whether the banner has finished loading.
+      setPaydayAdLayout(false);
+      await stopPaydayBanner();
+    } else {
+      await startPaydayAds();
+    }
   });
   window.addEventListener('offline', () => { stopPaydayBanner(); });
   window.addEventListener('online', () => { startPaydayAds(); });
