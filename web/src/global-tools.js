@@ -64,6 +64,9 @@ function addInterface(){
  if(!tabs||!nav||!main||$('fxPanel'))return;
  const tab=document.createElement('button');tab.className='tab';tab.dataset.panel='fxPanel';tab.textContent=tr('tab');tabs.append(tab);
  const navItem=document.createElement('button');navItem.className='navitem';navItem.dataset.panel='fxPanel';navItem.innerHTML='<b>⇄</b><span></span>';navItem.querySelector('span').textContent=tr('tab');nav.append(navItem);
+ const activate=()=>{document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id==='fxPanel'));document.querySelectorAll('[data-panel]').forEach(x=>x.classList.toggle('active',x.dataset.panel==='fxPanel'));window.scrollTo({top:0,behavior:'smooth'});};
+ tab.addEventListener('click',activate);
+ navItem.addEventListener('click',activate);
  const panel=document.createElement('section');panel.id='fxPanel';panel.className='panel fx-panel';
  panel.innerHTML=`<div class="fx-shell"><div class="fx-kicker">${tr('tools')}</div><h2>${tr('title')}</h2><p class="fx-sub">${tr('subtitle')}</p><div class="fx-field"><label for="fxAmount">${tr('amount')}</label><input id="fxAmount" type="number" min="0" step="any" value="100" inputmode="decimal"></div><div class="fx-pair"><div class="fx-field"><label for="fxFrom">${tr('from')}</label><select id="fxFrom"></select></div><button class="fx-swap" id="fxSwap" type="button" aria-label="${tr('swap')}">⇄</button><div class="fx-field"><label for="fxTo">${tr('to')}</label><select id="fxTo"></select></div></div><div class="fx-result"><small>${tr('convert')}</small><div class="fx-value" id="fxResult">—</div><div class="fx-meta" id="fxRate">${tr('loading')}</div><div class="fx-meta" id="fxDate"></div></div><div class="fx-status" id="fxStatus"></div><div class="fx-actions"><button id="fxRefresh" type="button">${tr('refresh')}</button></div></div><p class="fx-disclaimer">${tr('disclaimer')}</p>`;
  main.append(panel);
