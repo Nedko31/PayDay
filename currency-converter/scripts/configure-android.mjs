@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 // Replace this with the NEW app-specific AdMob ID before release.
-const appId = process.env.ADMOB_APP_ID || 'ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY';
+const appId = process.env.ADMOB_APP_ID || 'ca-app-pub-3940256099942544~3347511713';
 const manifestPath = path.resolve('android/app/src/main/AndroidManifest.xml');
 const stringsPath = path.resolve('android/app/src/main/res/values/strings.xml');
 
