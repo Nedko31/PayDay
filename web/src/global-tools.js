@@ -73,8 +73,10 @@ function addInterface(){
  const from=$('fxFrom'),to=$('fxTo');
  CURRENCIES.forEach(code=>{const label=code+(currencyNames[code]?' — '+currencyNames[code]:'');from.add(new Option(label,code));to.add(new Option(label,code));});
  const preferred=document.getElementById('currency')?.value||'EUR';from.value=CURRENCIES.includes(preferred)?preferred:'EUR';to.value=from.value==='USD'?'EUR':'USD';
- ['fxAmount','fxFrom','fxTo'].forEach(id=>$(id).addEventListener('input',calculate));
- $('fxSwap').addEventListener('click',()=>{const x=from.value;from.value=to.value;to.value=x;calculate(true)});
+ $('fxAmount').addEventListener('input',()=>calculate());
+ from.addEventListener('change',()=>loadRate(true));
+ to.addEventListener('change',()=>loadRate(true));
+ $('fxSwap').addEventListener('click',()=>{const x=from.value;from.value=to.value;to.value=x;loadRate(true)});
  $('fxRefresh').addEventListener('click',()=>loadRate(true));
 }
 function refreshLabels(){
@@ -108,26 +110,29 @@ async function loadCurrencies(){
 function cacheRates(from,to,record){try{const all=JSON.parse(localStorage.getItem(CACHE_KEY)||'{}');all[from+'_'+to]=record;localStorage.setItem(CACHE_KEY,JSON.stringify(all));}catch{}}
 function getCached(from,to){try{return JSON.parse(localStorage.getItem(CACHE_KEY)||'{}')[from+'_'+to]||null}catch{return null}}
 async function loadRate(force=false){
- const from=$('fxFrom').value,to=$('fxTo').value;if(from===to){rates={rate:1};rateDate=new Date().toISOString().slice(0,10);calculate();return}
+ const from=$('fxFrom').value,to=$('fxTo').value;
+ if(from===to){rates={base:from,quote:to,rate:1};rateDate=new Date().toISOString().slice(0,10);$('fxStatus').textContent='';renderConversion();return}
  if(busy)return;busy=true;$('fxStatus').textContent=tr('loading');
  try{
   if(!navigator.onLine)throw new Error('offline');
   const response=await fetch(API+'/rate/'+encodeURIComponent(from.toLowerCase())+'/'+encodeURIComponent(to.toLowerCase()),{cache:force?'no-store':'default'});
   if(!response.ok)throw new Error('rate');
   const record=await response.json();if(!Number.isFinite(Number(record.rate)))throw new Error('invalid rate');
+  if(record.base!==from||record.quote!==to)throw new Error('invalid pair');
   rates=record;rateDate=record.date||'';cacheRates(from,to,record);$('fxStatus').textContent='';
  }catch(error){
   const cached=getCached(from,to);
   if(cached){rates=cached;rateDate=cached.date||'';$('fxStatus').textContent=tr('offline')}
   else{$('fxStatus').textContent=error.message==='offline'?tr('offline'):tr('error');rates={};rateDate=''}
- }finally{busy=false;calculate(false)}
+ }finally{busy=false;renderConversion()}
 }
-function calculate(refresh=false){
- if(refresh||!rates.rate||rates.base!==$('fxFrom').value||rates.quote!==$('fxTo').value){loadRate();return}
- const amount=Math.max(0,Number($('fxAmount').value)||0),from=$('fxFrom').value,to=$('fxTo').value,rate=Number(rates.rate);
- $('fxResult').textContent=Number.isFinite(rate)?formatter(amount*rate,to):'—';
- $('fxRate').textContent=Number.isFinite(rate)?'1 '+from+' = '+new Intl.NumberFormat('en',{maximumSignificantDigits:9}).format(rate)+' '+to:tr('error');
- $('fxDate').textContent=rateDate?tr('updated')+': '+rateDate:'';
+function calculate(){renderConversion()}
+function renderConversion(){
+ const amount=Math.max(0,Number($('fxAmount').value)||0),from=$('fxFrom').value,to=$('fxTo').value;
+ const valid=rates.base===from&&rates.quote===to&&Number.isFinite(Number(rates.rate))&&Number(rates.rate)>0;
+ $('fxResult').textContent=valid?formatter(amount*Number(rates.rate),to):'—';
+ $('fxRate').textContent=valid?'1 '+from+' = '+new Intl.NumberFormat('en',{maximumSignificantDigits:9}).format(Number(rates.rate))+' '+to:tr('error');
+ $('fxDate').textContent=valid&&rateDate?tr('updated')+': '+rateDate:'';
 }
 function install(){
  addStyles();addInterface();loadCurrencies().then(()=>{if($('fxFrom'))loadRate()});
