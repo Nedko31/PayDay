@@ -49,7 +49,7 @@ const PAYDAY_ADMOB = {
   productionBannerId: 'ca-app-pub-7103616487584005/9772608224',
   // Google demo banner ID for Android testing. Never click test ads.
   testBannerId: 'ca-app-pub-3940256099942544/6300978111',
-  useTestAds: true // TEMPORARY: diagnostic build only; switch back before release
+  useTestAds: false
 };
 let paydayAdMobInitialized = false;
 let paydayBannerVisible = false;
@@ -123,7 +123,7 @@ async function startPaydayAds() {
       });
       paydayBannerVisible = true;
       setPaydayAdLayout(true);
-      showToast('AdMob: test banner request sent.');
+      showToast('AdMob: production banner request sent.');
     } catch (error) {
       // Ad failures must never prevent PayDay's budgeting features from working.
       console.warn('PayDay AdMob startup failed; app remains usable:', error);
