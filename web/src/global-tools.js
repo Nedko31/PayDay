@@ -40,7 +40,7 @@ let rates = {};
 let rateDate = '';
 let busy = false;
 const formatter = (value, code) => {
-  try { return new Intl.NumberFormat(navigator.language || 'en', {style:'currency',currency:code,maximumFractionDigits: code==='JPY'||code==='KRW'?0:2}).format(value); }
+  try { return new Intl.NumberFormat(document.documentElement.lang || 'en', {style:'currency',currency:code,maximumFractionDigits: code==='JPY'||code==='KRW'?0:2}).format(value); }
   catch { return value.toFixed(2)+' '+code; }
 };
 function addStyles(){
