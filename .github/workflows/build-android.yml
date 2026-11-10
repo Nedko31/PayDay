@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - feature/global-ui-fixes
+      - feature/payday-international-upgrade
 
 permissions:
   contents: read
