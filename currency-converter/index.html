@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#102b46"><meta name="description" content="Curvex — convert world currencies and major cryptocurrencies.">
+<title>Curvex</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#172536;background:#f2f6fa;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:0 0 82px}.app{max-width:620px;margin:auto;padding:18px}
+header{padding:22px 20px;background:linear-gradient(145deg,#102b46,#126b70);color:white;border-radius:0 0 24px 24px}
+h1{font-size:25px;margin:0 0 5px}header p{margin:0;color:#d5e9e8;font-size:13px}
+.card{background:white;border:1px solid #dce4ec;border-radius:18px;padding:17px;margin-top:16px;box-shadow:0 8px 24px #142c4b0a}
+label{display:block;font-size:12px;font-weight:800;color:#66778a;margin:12px 0 6px}
+input,select{width:100%;padding:13px;border:1px solid #dce4ec;border-radius:11px;background:#fff;color:#172536;font:inherit}
+.pair{display:grid;grid-template-columns:1fr 44px 1fr;gap:8px;align-items:end}
+button{border:0;border-radius:11px;padding:12px 14px;font-weight:800;cursor:pointer}
+#swap{height:46px;background:#e2efed;color:#12665e;font-size:20px}
+.result{background:#edf7f5;border-radius:14px;padding:15px;margin-top:15px}
+.result small{color:#55716e;font-weight:800;text-transform:uppercase;font-size:10px}
+#output{font-size:clamp(27px,7vw,36px);font-weight:900;overflow-wrap:anywhere;margin:5px 0}
+#rate,#updated,#status,.note{font-size:12px;color:#66778a;line-height:1.5}
+.actions{display:flex;gap:8px;margin-top:13px}.primary{background:#087f73;color:white;flex:1}.secondary{background:#e9eef3;color:#34475a}
+.adbar{position:fixed;bottom:0;left:0;right:0;min-height:52px;background:#fff;border-top:1px solid #dce4ec;display:flex;align-items:center;justify-content:center;z-index:10;padding:4px 42px 4px 4px}
+#ad-slot{width:100%;min-height:50px;display:flex;align-items:center;justify-content:center}
+#hide-ad{position:absolute;right:7px;top:8px;background:#edf1f5;color:#34475a;padding:7px 9px;font-size:11px}
+.hidden{display:none!important}
+@media(max-width:390px){.app{padding:12px}.pair{grid-template-columns:1fr 38px 1fr;gap:5px}}
+</style>
+</head>
+<body>
+<header><div class="app"><h1>Curvex</h1><p>World currencies & crypto · Simple, fast, global</p></div></header>
+<main class="app">
+<section class="card">
+<label for="amount">Amount</label><input id="amount" type="number" min="0" step="any" value="100" inputmode="decimal">
+<div class="pair"><div><label for="from">From</label><select id="from"></select></div><button id="swap" aria-label="Swap currencies">⇄</button><div><label for="to">To</label><select id="to"></select></div></div>
+<div class="result"><small>Converted amount</small><div id="output">—</div><div id="rate">Loading rates…</div><div id="updated"></div></div>
+<div class="actions"><button class="primary" id="refresh">Refresh rates</button><button class="secondary" id="copy">Copy</button></div>
+<p class="note">Fiat rates are reference rates, not live bank quotes. Crypto prices are market data and can change rapidly. Always check the final rate with your provider.</p>
+<div id="status" role="status"></div>
+</section>
+</main>
+<div class="adbar" id="adbar"><div id="ad-slot"></div><button id="hide-ad">Hide ad</button></div>
+<script type="module" src="/src/main.js"></script>
+</body></html>
