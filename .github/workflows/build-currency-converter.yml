@@ -1,0 +1,36 @@
+name: Build Currency Converter Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/payday-international-upgrade
+    paths:
+      - 'currency-converter/**'
+      - '.github/workflows/build-currency-converter.yml'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: currency-converter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm install
+      - run: npx cap add android
+      - run: npm run android:sync
+      - run: chmod +x android/gradlew && cd android && ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Currency-Converter-debug-APK
+          path: currency-converter/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
