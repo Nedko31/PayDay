@@ -106,6 +106,7 @@ async function startPaydayAds() {
           if (paydayBannerVisible) setPaydayAdLayout(true, info?.height || 60);
         });
         await AdMob.addListener(BannerAdPluginEvents.Loaded, async () => {
+          paydayBannerCreated = true;
           if (paydayAdHiddenByUser) {
             paydayBannerVisible = false;
             setPaydayAdLayout(false);
