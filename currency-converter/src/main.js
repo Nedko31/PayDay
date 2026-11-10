@@ -1,6 +1,3 @@
-import { Capacitor } from '@capacitor/core';
-import { AdMob, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
-
 const FIAT_API='https://api.frankfurter.dev/v2';
 const CRYPTO_API='https://api.coingecko.com/api/v3/simple/price';
 const CRYPTO={
@@ -43,16 +40,3 @@ $('swap').addEventListener('click',()=>{const v=$('from').value;$('from').value=
 $('refresh').addEventListener('click',refresh);
 $('copy').addEventListener('click',async()=>{if(state.last){try{await navigator.clipboard.writeText(state.last);$('status').textContent='Copied.'}catch{$('status').textContent='Copy is not available on this device.'}}});
 populate();refresh();window.addEventListener('online',refresh);
-const ADMOB_APP_ID='ca-app-pub-3940256099942544~3347511713';
-const ADMOB_BANNER_ID='ca-app-pub-3940256099942544/6300978111';
-let bannerHidden=false;
-async function startAds(){
- if(Capacitor.getPlatform()!=='android'||!navigator.onLine||bannerHidden)return;
- try{
-  await AdMob.initialize();
-  await AdMob.showBanner({adId:ADMOB_BANNER_ID,adSize:BannerAdSize.ADAPTIVE_BANNER,position:BannerAdPosition.BOTTOM,margin:0,isTesting:true});
-  $('adbar').classList.remove('hidden');
- }catch(e){console.warn('AdMob banner unavailable',e);}
-}
-$('hide-ad').addEventListener('click',async()=>{bannerHidden=true;$('adbar').classList.add('hidden');if(Capacitor.getPlatform()==='android'){try{await AdMob.hideBanner()}catch{}}});
-startAds();window.addEventListener('online',startAds);
