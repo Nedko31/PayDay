@@ -4,5 +4,5 @@
     <string name="title_activity_main">PayDay</string>
     <string name="package_name">bg.jorge.payday</string>
     <string name="custom_url_scheme">bg.jorge.payday</string>
-    <string name="admob_app_id">ca-app-pub-7326151414179206~5828675543</string>
+    <string name="admob_app_id">ca-app-pub-7103616487584005~5306090460</string>
 </resources>
